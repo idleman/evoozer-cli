@@ -1,0 +1,23 @@
+{
+  "name": "dental-care-plattform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./evoozer-cli",
+  "license": "UNLICENSED",
+  "author": "Fredrik Olofsson <evoozer@gmail.com>",
+  "scripts": {
+    "test": "mocha -r @std/esm src/**/*.test.mjs --bail"
+  },
+  "bugs": {
+    "url": "https://github.com/idleman/evoozer-cli/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idleman/evoozer-cli.git"
+  },
+  "homepage": "https://github.com/idleman/evoozer-cli#readme",
+  "dependencies": {
+    "evoozer": "github:idleman/evoozer",
+    "left-pad": "^1.2.0"
+  }
+}
