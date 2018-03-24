@@ -2,22 +2,27 @@
   "name": "dental-care-plattform",
   "version": "1.0.0",
   "description": "",
-  "main": "./evoozer-cli",
+  "main": "./evoozer-cli.mjs",
   "license": "UNLICENSED",
   "author": "Fredrik Olofsson <evoozer@gmail.com>",
-  "scripts": {
-    "test": "mocha -r @std/esm src/**/*.test.mjs --bail"
-  },
+  "homepage": "https://github.com/idleman/evoozer-cli#readme",
   "bugs": {
     "url": "https://github.com/idleman/evoozer-cli/issues"
+  },
+  "scripts": {
+    "test": "mocha -r @std/esm src/**/*.test.mjs --bail",
+    "install": "npm install -g webpack webpack-cli"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/idleman/evoozer-cli.git"
   },
-  "homepage": "https://github.com/idleman/evoozer-cli#readme",
   "dependencies": {
+    "@babel/core": "^7.0.0-beta.42",
+    "@babel/preset-env": "^7.0.0-beta.42",
+    "babel-loader": "^8.0.0-beta.2",
     "evoozer": "github:idleman/evoozer",
-    "left-pad": "^1.2.0"
+    "left-pad": "^1.2.0",
+    "webpack": "^4.2.0"
   }
 }

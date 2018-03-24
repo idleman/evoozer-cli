@@ -1,3 +1,3 @@
 {
-  "main": "./build.mjs"
+  "main": "./build"
 }

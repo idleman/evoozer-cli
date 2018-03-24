@@ -4,8 +4,8 @@ export default ['yargsProvider', yargsProvider => {
     const { stdout } = process;
 
     const printWorkspaceDetails = (result) => {
-      const { name, directory } = result;
-      stdout.write(`Created ${name} at ${directory}.`);
+      const { name } = result;
+      stdout.write(`Created workspace: "${name}".`);
     };
 
     yargsProvider.command({

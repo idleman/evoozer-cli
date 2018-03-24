@@ -5,24 +5,19 @@ export default [
   'workspace/config',
   ($invoke, process, getWorkspaceConfig) => {
 
-    const throwError = err => {
-      throw err;
-    };
-
     return function getClientConfig(name) {
-      return Promise.resolve()
-        .then(getWorkspaceConfig)
-        .then(config => {
-          const { directories = {} } = config;
-          const { client = './client' } = directories;
-          const main = client + (name ? `/${name}` : '');
-          const cache = ''; // persistent cache between builds.
-          const tmp = ''; // tmp folder,
-          const dist = client + (name ? `/${name}` : '');
 
+      return getWorkspaceConfig()
+        .then(config => {
+          const { directories: workspaceDirectories } = config;
+          const folder = (name ? `${name}/` : '');
+          const directory = workspaceDirectories.client + folder;
+          const build = workspaceDirectories.build + folder;
+          const directories = { build };
           return {
-            directory
-          }
+            directory,
+            directories
+          };
         });
     };
   }
