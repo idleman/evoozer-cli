@@ -8,7 +8,8 @@ export default [
     const WORKSPACE_GIT_REPOSITORY_NAME = 'evoozer-workspace';
     const WORKSPACE_GIT_REPOSITORY_URL = `https://github.com/idleman/${WORKSPACE_GIT_REPOSITORY_NAME}.git`;
 
-    return function createWorkspaceDirectory(name) {
+    return function createWorkspaceDirectory(workspaceOptions) {
+      const { name } = workspaceOptions;
       return Promise.resolve()
         .then(() => exec(`git clone --depth 1 --shallow-submodules ${WORKSPACE_GIT_REPOSITORY_URL}`))
         .then(() => remove(`${WORKSPACE_GIT_REPOSITORY_NAME}/.git`))

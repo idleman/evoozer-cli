@@ -15,7 +15,7 @@ export default ['yargsProvider', yargsProvider => {
           .command({
             command: 'create [...args]',
             handler: ['$$argv', '$invoke', ($$argv, $invoke) => {
-              return $invoke(['workspace/create',  createWorkspace => createWorkspace($$argv.name)])
+              return $invoke(['workspace/create',  createWorkspace => createWorkspace($$argv)])
                 .then(printWorkspaceDetails);
             }]
           });
