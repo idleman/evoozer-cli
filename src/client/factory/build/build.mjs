@@ -1,6 +1,6 @@
 import path from 'path';
-import mkdir from 'mkdir-recursive';
-const { normalize } = path;
+import mkdirRecursive from 'mkdir-recursive';
+const { mkdir } = mkdirRecursive;
 
 //path.normalize('/foo/bar//baz/asdf/quux/..');
 
