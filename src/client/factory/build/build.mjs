@@ -68,6 +68,10 @@ instance.initiate()
           console.log(`createWrapperFolder createDirectory(${tmp + '../../'})`)
           return createDirectory(tmp + '../../')
         })
+        .then(null, err => {
+          console.error(err);
+          throw err;
+        })
         .then(() => {
           console.log(`createWrapperFolder createDirectory(${tmp + '../'})`);
           return createDirectory(tmp + '../')
