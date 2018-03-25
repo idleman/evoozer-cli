@@ -35,7 +35,8 @@ export default ['yargsProvider', yargsProvider => {
     };
 
     const onError = (err) => {
-      stderr.write(err);
+      console.error('Critical error...');
+      console.error(err);
       process.exit(1);
     };
 
