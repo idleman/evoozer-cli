@@ -65,6 +65,10 @@ instance.initiate()
 
       return Promise.resolve()
         .then(() => {
+          console.log(`createWrapperFolder createDirectory(${tmp + '../../../'})`)
+          return createDirectory(tmp + '../../../')
+        })
+        .then(() => {
           console.log(`createWrapperFolder createDirectory(${tmp + '../../'})`)
           return createDirectory(tmp + '../../')
         })
