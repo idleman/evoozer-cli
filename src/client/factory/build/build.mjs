@@ -91,14 +91,18 @@ instance.initiate()
 
     return function buildClient(options) {
       const { mode = 'development', name } = options;
+      console.log('buildClient', options);
       return getClientConfig(name)
         .then(config => {
+          console.log('buildClient client config', config);
           return createWrapperFolder(config)
             .then(inputPath => {
+              console.log('buildClient inputPath', inputPath);
               const output = config.directories.build;
               const cmd = `webpack-cli --mode ${mode} ${inputPath} --output-path="${output}" --output-filename="[hash].js" --module-bind js=babel-loader`;
               //const cwd = '../';
               const options = { };
+              console.log('buildClient exec', cmd);
               return exec(cmd, options)
                 .then(getBuildInformation)
                 .then(buildInfo => updateBuildLog(output, name, buildInfo))
