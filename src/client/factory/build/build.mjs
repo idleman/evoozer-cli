@@ -74,7 +74,7 @@ instance.initiate()
         })
         .then(() => {
           console.log(`createWrapperFolder createDirectory(${tmp + '../'})`);
-          createDirectory(tmp)
+          return createDirectory(tmp)
         })
         .then(() => createDirectory(browserBuildDir))
         .then(() => {
