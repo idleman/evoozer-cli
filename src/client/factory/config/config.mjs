@@ -13,7 +13,8 @@ export default [
           const folder = (name ? `${name}/` : '');
           const directory = workspaceDirectories.client + folder;
           const build = workspaceDirectories.build + folder;
-          const directories = { build };
+          const tmp = workspaceDirectories.tmp + (name ? `client/${name}/` : '');
+          const directories = { build, tmp };
           return {
             directory,
             directories

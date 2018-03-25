@@ -5,6 +5,8 @@ import config from './config';
 import create from './create';
 import list from './list';
 import status from './status';
+import watch from './watch';
+import serve from './serve';
 
 
 export default new Module(null, [ filesystem ])
@@ -12,4 +14,6 @@ export default new Module(null, [ filesystem ])
   .factory('client/build', build)
   .factory('client/create', create)
   .factory('client/list', list)
-  .factory('client/status', status);
+  .factory('client/serve', serve)
+  .factory('client/status', status)
+  .factory('client/watch', watch);

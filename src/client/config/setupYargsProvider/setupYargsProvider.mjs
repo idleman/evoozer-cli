@@ -3,7 +3,7 @@ import leftPad from 'left-pad';
 export default ['yargsProvider', yargsProvider => {
   yargsProvider.configure(['process', process => {
 
-    const { stdout } = process;
+    const { stdout, stderr } = process;
     const printClientList = clientNames => {
       const createLine = (count, name) => `${leftPad(count, 5)} | ${name}`;
       const header = createLine('Count', 'Name');
@@ -18,7 +18,7 @@ export default ['yargsProvider', yargsProvider => {
       stdout.write(`Created ${name}.`);
     };
 
-    const printBuildResult = (result) => {
+    const printBuildResult = (result = {}) => {
       const { buildDirectory, buildAt } = result;
       stdout.write(`Build succeeded. Output was written to: ${buildDirectory} and took ${buildAt}.`);
     };
@@ -34,10 +34,37 @@ export default ['yargsProvider', yargsProvider => {
       stdout.write(`Build time:\t${buildAt}.\n`);
     };
 
+    const onError = (err) => {
+      stderr.write(err);
+    };
+
+    const onClientServe = (childProcess) => {
+
+      childProcess.on('error', onError);
+      childProcess.on('exit', exitCode => {
+        console.log('Process terminated with exit code: ' + exitCode);
+      });
+      console.log('onClientServe', childProcess);
+    };
+
     yargsProvider.command({
       command: 'client',
       builder: yargs => {
         yargs
+          .command({
+            command: 'watch [...args]',
+            handler: ['$$argv', '$invoke', ($$argv, $invoke) => {
+              return $invoke(['client/watch',  watchClient => watchClient($$argv)])
+                .then(null, onError);
+            }]
+          })
+          .command({
+            command: 'serve [...args]',
+            handler: ['$$argv', '$invoke', ($$argv, $invoke) => {
+              return $invoke(['client/serve',  serveClient => serveClient($$argv)])
+                .then(onClientServe, onError);
+            }]
+          })
           .command({
             command: 'status [...args]',
             handler: ['$$argv', '$invoke', ($$argv, $invoke) => {
@@ -49,7 +76,7 @@ export default ['yargsProvider', yargsProvider => {
             command: 'build [...args]',
             handler: ['$$argv', '$invoke', ($$argv, $invoke) => {
               return $invoke(['client/build',  buildClient => buildClient($$argv)])
-                .then(printBuildResult);
+                .then(printBuildResult, onError);
             }]
           })
           .command({
