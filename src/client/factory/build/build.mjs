@@ -55,15 +55,31 @@ instance.initiate()
     };
 
     const createWrapperFolder = config => {
+      console.log('createWrapperFolder', config);
       const { tmp } = config.directories;
       const browserBuildDir = `${tmp}browser-build/`;
+      console.log('createWrapperFolder browserBuildDir', {
+        browserBuildDir,
+        cwd: process.cwd()
+      });
+
       return Promise.resolve()
-        .then(() => createDirectory(tmp + '../../'))
-        .then(() => createDirectory(tmp + '../'))
-        .then(() => createDirectory(tmp))
+        .then(() => {
+          console.log(`createWrapperFolder createDirectory(${tmp + '../../'})`)
+          return createDirectory(tmp + '../../')
+        })
+        .then(() => {
+          console.log(`createWrapperFolder createDirectory(${tmp + '../'})`);
+          return createDirectory(tmp + '../')
+        })
+        .then(() => {
+          console.log(`createWrapperFolder createDirectory(${tmp + '../'})`);
+          createDirectory(tmp)
+        })
         .then(() => createDirectory(browserBuildDir))
         .then(() => {
           const appSource = `../../../../${config.directory}`;
+          console.log('createWrapperFolder appSource:' + appSource);
           return Promise.all([createWraperIndexFile(browserBuildDir, appSource), createWraperPackageJsonFile(browserBuildDir)])
             .then(() => browserBuildDir);
         });
