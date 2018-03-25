@@ -20,11 +20,14 @@ import path from 'path';
 import src from '${appSource.replace(/\/$/, '')}';
 
 
-const app = new Module('dentalCareWebApplication', [ WebApplication, src ])
+const app = new Module(null, [ WebApplication, src ])
   .config(['webApplicationProvider', webApplicationProvider => {
+    console.log('CConfiguring webApplicationProvider');
+    const port = (process.env.PORT || 8080)|0;
+    console.log('webApplicationProvider port: ', port);
     webApplicationProvider
       ${publicDirectories.map(toAddPublicDirectoryCall).join('\n')}
-      .addServer({ host: 'localhost', port: process.env.PORT || 8080 })
+      .addServer({ port })
   }])
   .config(['routerProvider', routerProvider => {
     const script = [
