@@ -24,7 +24,7 @@ const app = new Module('dentalCareWebApplication', [ WebApplication, src ])
   .config(['webApplicationProvider', webApplicationProvider => {
     webApplicationProvider
       ${publicDirectories.map(toAddPublicDirectoryCall).join('\n')}
-      .addServer({ host: 'localhost', port: 8080 })
+      .addServer({ host: 'localhost', port: process.env.PORT || 8080 })
   }])
   .config(['routerProvider', routerProvider => {
     const script = [
@@ -36,7 +36,7 @@ const app = new Module('dentalCareWebApplication', [ WebApplication, src ])
   }])
   .run(['webApplication', (webApplication) => {
     const onListening = servers => {
-      console.log('Server listening on ', servers.map(({ host, port }) => host + ':' + port).join(', '));
+      //console.log('Server listening on ', servers.map(({ host, port }) => host + ':' + port).join(', '));
       process.on('SIGTERM', () => {
         console.log('SIGTERM RECEIBVED!');
         const closeServer = server => new Promise((resolve, reject) => server.close(err => err ? reject(err) : resolve()));
