@@ -2,12 +2,51 @@ import chokidar from 'chokidar';
 // One-liner for current directory, ignores .dotfiles
 
 //path.normalize('/foo/bar//baz/asdf/quux/..');
+
+// Returns a function, that, when invoked, will only be triggered at most once
+// during a given window of time. Normally, the throttled function will run
+// as much as it can, without ever going more than once per `wait` duration;
+// but if you'd like to disable the execution on the leading edge, pass
+// `{leading: false}`. To disable execution on the trailing edge, ditto.
+function throttle(func, wait, options) {
+  var context, args, result;
+  var timeout = null;
+  var previous = 0;
+  if (!options) options = {};
+  var later = function() {
+    previous = options.leading === false ? 0 : Date.now();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+  return function() {
+    var now = Date.now();
+    if (!previous && options.leading === false) previous = now;
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout && options.trailing !== false) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+};
+
 export default [
   'process',
   'client/config',
   'client/build',
+  'client/serve',
   'client/status',
-  (process, getClientConfig, buildClient, getClientStatus) => {
+  (process, getClientConfig, buildClient, serveClient, getClientStatus) => {
     const { stdout } = process;
 
 
@@ -17,41 +56,93 @@ export default [
       const printBuildResult = (function() {
         let counter = 0;
         return (result) => {
-          const { date, hash, buildAt, error } = result;
+          const { date, hash, buildAt, error, server } = result;
 
           if(error) {
             stdout.write(`[${++counter}]\t${error}\n`);
             return;
           }
+
+          if(server) {
+            stdout.write(`[${++counter}]\tserver:\t${server}\n`);
+            return;
+          }
+
+
           stdout.write(`[${++counter}]\t${hash}\t${date}\t${buildAt}\n`);
         };
       })();
 
       const build = (function() {
         const queue = [];
-
+        let tmpPromise = null;
         const notify = (result) => {
           if(result) {
+            tmpPromise = null;
             printBuildResult(result);
           }
           if(queue.length === 0) {
-            return result;
+            tmpPromise = null;
+            return Promise.resolve(result);
           }
           queue.length = 0;
           return buildClient(watchOptions)
             .then(notify, (error) => notify({ error }));
         };
 
-        return () => {
+        const addRequest = () => {
           queue.push({});
-          return setTimeout(notify.bind(null, null), 250);
+          if(tmpPromise) {
+            return tmpPromise;
+          }
+          tmpPromise = notify();
+          return tmpPromise;
         };
+
+        return throttle(addRequest, 250);
       }());
 
 
-      const updateServer = buildVersion => {
-        console.log('run serve here', buildVersion);
-      };
+      const updateServer = (function() {
+        const queue = [];
+        let childProcessPromise = null;
+
+        const notify = () => {
+          const request = queue.pop();
+          if(!request) {
+            return;
+          }
+          queue.length = 0;
+          if(childProcessPromise) {
+            childProcessPromise.then(childProcess => {
+              printBuildResult({ server: 'kill' });
+              childProcess.kill();
+              childProcessPromise = null;
+            });
+            return;
+          }
+
+          const addEventListeners = (childProcess) => {
+            printBuildResult({ server: 'success' });
+            childProcess.on('exit', code => {
+              queue.push({});
+              notify();
+            })
+          };
+          const onError = (error) => {
+            printBuildResult({ error });
+            childProcessPromise = null;
+          };
+          printBuildResult({ server: 'start' });
+          childProcessPromise = serveClient(watchOptions);
+          childProcessPromise.then(addEventListeners, onError);
+        };
+
+        return (version) => {
+          queue.push({ version });
+          return notify();
+        };
+      })();
 
       const checkCurrentBuildVersion = (function() {
         let currentBuildVersion = {};

@@ -1,6 +1,5 @@
 import child_process from 'child_process';
 
-const { spawn } = child_process;
 export default [
   'env/exec',
   'workspace/config',
@@ -35,8 +34,23 @@ const app = new Module('dentalCareWebApplication', [ WebApplication, src ])
     routerProvider
       .when('/*', { head }); 
   }])
-  .run(['webApplication', webApplication => {
-    const onListening = servers => console.log('Server listening on ', servers.map(({ host, port }) => host + ':' + port).join(', '));
+  .run(['webApplication', (webApplication) => {
+    const onListening = servers => {
+      console.log('Server listening on ', servers.map(({ host, port }) => host + ':' + port).join(', '));
+      process.on('SIGTERM', () => {
+        console.log('SIGTERM RECEIBVED!');
+        const closeServer = server => new Promise((resolve, reject) => server.close(err => err ? reject(err) : resolve()));
+        const terminateProcess = (err) => {
+          if(err) {
+            console.error(err);
+            return process.exit(1);
+          }
+          return process.exit(0);
+        };
+        return Promise.all(servers.map(closeServer))
+          .then(terminateProcess.bind(null, null), terminateProcess)
+      });
+    };
     const onError = err => {
       console.error(err);
       process.exit(1)
@@ -88,7 +102,8 @@ instance.initiate()
         .then(config => {
           return createWrapperFolder(config, serveOptions)
             .then(inputPath => {
-              return exec(`node --experimental-modules ${inputPath}`);
+              const argv = ['--experimental-modules', inputPath];
+              return child_process.spawn('node', argv, { stdio: 'inherit' });
 
                 //.then(.con)
               // const output = config.directories.build;

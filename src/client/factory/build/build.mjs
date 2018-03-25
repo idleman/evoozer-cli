@@ -104,6 +104,7 @@ instance.initiate()
                 .then(buildInfo => updateBuildLog(output, name, buildInfo))
                 .then(buildInfo => Object.assign({}, buildInfo, { buildDirectory: output }))
                 .then(buildData => {
+                  return buildData;
                   return createDevelopmentIndexHtmlFile(output, buildData.hash)
                     .then(() => buildData);
                 })

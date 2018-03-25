@@ -39,12 +39,9 @@ export default ['yargsProvider', yargsProvider => {
     };
 
     const onClientServe = (childProcess) => {
-
-      childProcess.on('error', onError);
-      childProcess.on('exit', exitCode => {
-        console.log('Process terminated with exit code: ' + exitCode);
+      return new Promise((resolve, reject) => {
+        childProcess.on('exit', (code) => !code ? resolve() : reject(new Error(`Process exited with code ${code}`)));
       });
-      console.log('onClientServe', childProcess);
     };
 
     yargsProvider.command({
