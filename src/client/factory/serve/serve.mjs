@@ -36,7 +36,7 @@ const app = new Module('dentalCareWebApplication', [ WebApplication, src ])
   }])
   .run(['webApplication', (webApplication) => {
     const onListening = servers => {
-      //console.log('Server listening on ', servers.map(({ host, port }) => host + ':' + port).join(', '));
+      console.log('Server listening on ', servers.map(({ host, port }) => host + ':' + port).join(', '));
       process.on('SIGTERM', () => {
         console.log('SIGTERM RECEIBVED!');
         const closeServer = server => new Promise((resolve, reject) => server.close(err => err ? reject(err) : resolve()));
