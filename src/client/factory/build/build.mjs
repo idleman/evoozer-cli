@@ -1,15 +1,19 @@
 import path from 'path';
-
+import mkdir from 'mkdir-recursive';
 const { normalize } = path;
 
 //path.normalize('/foo/bar//baz/asdf/quux/..');
+
+
+const createDirectory = (path, cb) => new Promise((resolve, reject) => mkdir(path, err => err ? reject(err) : resolve()));
+
 export default [
   'env/exec',
   'client/config',
-  'filesystem/createDirectory',
+  //'filesystem/createDirectory',
   'filesystem/appendFile',
   'filesystem/writeFile',
-  (exec, getClientConfig, createDirectory, appendFile, writeFile) => {
+  (exec, getClientConfig, appendFile, writeFile) => {
 
   const createDevelopmentIndexHtmlFile = (buildDirectory, version)  => {
     const content =`<!DOCTYPE html><html><head><script src="${version}.js" defer></script></head><body></body></html>`;
@@ -63,33 +67,16 @@ instance.initiate()
         cwd: process.cwd()
       });
 
-      return Promise.resolve()
-        .then(() => {
-          console.log(`createWrapperFolder createDirectory(${tmp + '../../../'})`)
-          return createDirectory(tmp + '../../../')
-        })
-        .then(() => {
-          console.log(`createWrapperFolder createDirectory(${tmp + '../../'})`)
-          return createDirectory(tmp + '../../')
-        })
-        .then(null, err => {
-          console.error(err);
-          throw err;
-        })
-        .then(() => {
-          console.log(`createWrapperFolder createDirectory(${tmp + '../'})`);
-          return createDirectory(tmp + '../')
-        })
-        .then(() => {
-          console.log(`createWrapperFolder createDirectory(${tmp + '../'})`);
-          return createDirectory(tmp)
-        })
-        .then(() => createDirectory(browserBuildDir))
+      return createDirectory(browserBuildDir)
         .then(() => {
           const appSource = `../../../../${config.directory}`;
           console.log('createWrapperFolder appSource:' + appSource);
           return Promise.all([createWraperIndexFile(browserBuildDir, appSource), createWraperPackageJsonFile(browserBuildDir)])
             .then(() => browserBuildDir);
+        })
+        .then(null, err => {
+          console.error(err);
+          throw err;
         });
     };
 

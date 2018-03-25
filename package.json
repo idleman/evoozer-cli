@@ -27,6 +27,7 @@
     "chokidar": "^2.0.3",
     "evoozer": "github:idleman/evoozer",
     "left-pad": "^1.2.0",
+    "mkdir-recursive": "^0.4.0",
     "webpack": "^4.2.0"
   }
 }

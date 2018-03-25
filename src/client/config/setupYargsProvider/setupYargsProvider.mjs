@@ -36,6 +36,7 @@ export default ['yargsProvider', yargsProvider => {
 
     const onError = (err) => {
       stderr.write(err);
+      process.exit(1);
     };
 
     const onClientServe = (childProcess) => {
