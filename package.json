@@ -9,6 +9,9 @@
   "bugs": {
     "url": "https://github.com/idleman/evoozer-cli/issues"
   },
+  "bin": {
+    "evoozer-cli": "./evoozer-cli.mjs"
+  },
   "scripts": {
     "test": "mocha -r @std/esm src/**/*.test.mjs --bail",
     "install": "npm install -g webpack webpack-cli"
