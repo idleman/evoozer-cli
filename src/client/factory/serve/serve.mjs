@@ -42,6 +42,7 @@ const app = new Module(null, [ WebApplication, src ])
     console.log('CConfiguring webApplicationProvider');
     const port = (process.env.PORT || 8080)|0;
     const keyPath = ${JSON.stringify(key)};
+    const certPath = ${JSON.stringify(cert)};
     const caPath = ${JSON.stringify(ca)};
     const key = keyPath ? fs.readFileSync(keyPath) : null;
     const cert = certPath ? fs.readFileSync(certPath) : null;
