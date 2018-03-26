@@ -24,8 +24,8 @@ export default [
       } = opt;
 
 
-      const key = ssl.key ? `${source}/${ssl.key}` : null;
-      const cert = ssl.cert ? `${source}/${ssl.cert}` : null;
+      const key = ssl.key ? `${source}/${ssl.key}` : '';
+      const cert = ssl.cert ? `${source}/${ssl.cert}` : '';
 
       const content =`import Module from 'evoozer/Module';
 import WebApplication from 'evoozer/Module/web-application';
@@ -48,7 +48,7 @@ const app = new Module(null, [ WebApplication, src ])
   }])
   .config(['routerProvider', routerProvider => {
     const script = [
-     { src: '${entryScript}', async: true }
+     { src: '${entryScript}', defer: true }
     ];
     const head = { script }; 
     routerProvider
@@ -95,33 +95,35 @@ instance.initiate()
     };
 
     const createWrapperFolder = (config, serveOptions) => {
+      const clientDirectory = config.directory;
       const { build, tmp } = config.directories;
-      const directory = `${tmp}server-build/`;
+      const buildDirectory = `${tmp}server-build/`;
       return Promise.resolve()
         .then(() => createDirectory(tmp + '../../'))
         .then(() => createDirectory(tmp + '../'))
         .then(() => createDirectory(tmp))
-        .then(() => createDirectory(directory))
+        .then(() => createDirectory(buildDirectory))
         .then(() => getClientStatus(serveOptions))
         .then(status => {
           const { hash } = status;
-          const source = `../../../../${config.directory}`;
+          const source = `../../../../${config.buildDirectory}`;
           const publicDirectories = [build, `${source}public/`];
           const entryScript = `${hash}.js`;
           const { serverOptions = {} } = config;
           const { ssl = {} } = serverOptions;
           return Promise.all([
-            createWraperPackageJsonFile(directory),
+            createWraperPackageJsonFile(buildDirectory),
             createWraperIndexFile({
               ssl,
               source,
-              directory,
               entryScript,
+              buildDirectory,
+              clientDirectory,
               publicDirectories
             })
           ])
         })
-        .then(() => directory);
+        .then(() => buildDirectory);
     };
 
     return function serveClient(serveOptions) {
