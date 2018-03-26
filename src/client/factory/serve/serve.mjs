@@ -24,8 +24,8 @@ export default [
       const {
         ssl,
         source,
-        directory,
         entryScript,
+        buildDirectory,
         clientDirectory,
         publicDirectories
       } = opt;
@@ -91,7 +91,7 @@ const instance = app.createInstance();
 
 instance.initiate()
   .then(null, console.error.bind(console));`;
-      const src = `${directory}index.mjs`;
+      const src = `${buildDirectory}index.mjs`;
       return writeFile(src, content, 'utf8');
     };
 
