@@ -1,14 +1,20 @@
 import child_process from 'child_process';
-import fs from 'fs';
+import mkdirRecursive from 'mkdir-recursive';
+const { mkdir } = mkdirRecursive;
+
+//path.normalize('/foo/bar//baz/asdf/quux/..');
+
+
+const createDirectory = (path, cb) => new Promise((resolve, reject) => mkdir(path, err => err ? reject(err) : resolve()));
 
 export default [
   'env/exec',
   'workspace/config',
   'client/config',
   'client/status',
-  'filesystem/createDirectory',
+  //'filesystem/createDirectory',
   'filesystem/writeFile',
-  (exec, getWorkspaceConfig, getClientConfig, getClientStatus, createDirectory, writeFile) => {
+  (exec, getWorkspaceConfig, getClientConfig, getClientStatus, writeFile) => {
 
     const toAddPublicDirectoryCall = (publicDirectory) => {
       return `.addPublicDirectory('${publicDirectory}')`;
@@ -100,14 +106,11 @@ instance.initiate()
       const { build, tmp } = config.directories;
       const buildDirectory = `${tmp}server-build/`;
       return Promise.resolve()
-        .then(() => createDirectory(tmp + '../../'))
-        .then(() => createDirectory(tmp + '../'))
-        .then(() => createDirectory(tmp))
         .then(() => createDirectory(buildDirectory))
         .then(() => getClientStatus(serveOptions))
         .then(status => {
           const { hash } = status;
-          const source = `../../../../${config.buildDirectory}`;
+          const source = `../../../../${config.build}`;
           const publicDirectories = [build, `${source}public/`];
           const entryScript = `${hash}.js`;
           const { serverOptions = {} } = config;
@@ -128,7 +131,8 @@ instance.initiate()
     };
 
     return function serveClient(serveOptions) {
-      const { mode = 'development', name } = serveOptions;
+      const { NODE_ENV = 'development' } = process.env;
+      const { mode = NODE_ENV, name } = serveOptions;
       return getClientConfig(name)
         .then(config => {
           return createWrapperFolder(config, serveOptions)
