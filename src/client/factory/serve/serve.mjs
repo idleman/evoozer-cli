@@ -133,7 +133,7 @@ instance.initiate()
               const argv = ['--experimental-modules', inputPath];
               return child_process.spawn('node', argv, { stdio: 'inherit' });
 
-                //.then(.con)
+              //.then(.con)
               // const output = config.directories.build;
               // const cmd = `webpack-cli --mode ${mode} ${inputPath} --output-path="${output}" --output-filename="[hash].js" --module-bind js=babel-loader`;
               // const options = { };
