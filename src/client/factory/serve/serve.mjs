@@ -25,8 +25,8 @@ export default [
       } = opt;
 
 
-      const key = ssl.key ? `${source}/${ssl.key}` : '';
-      const cert = ssl.cert ? `${source}/${ssl.cert}` : '';
+      const key = ssl.key ? `${clientDirectory}/${ssl.key}` : '';
+      const cert = ssl.cert ? `${clientDirectory}/${ssl.cert}` : '';
 
       const content =`import Module from 'evoozer/Module';
 import WebApplication from 'evoozer/Module/web-application';
@@ -38,8 +38,8 @@ const app = new Module(null, [ WebApplication, src ])
   .config(['webApplicationProvider', webApplicationProvider => {
     console.log('CConfiguring webApplicationProvider');
     const port = (process.env.PORT || 8080)|0;
-    const keyPath = ${JSON.stringify(key ? clientDirectory + key : '')};
-    const certPath = ${JSON.stringify(cert ? clientDirectory + cert : '')};
+    const keyPath = ${JSON.stringify(key)};
+    const certPath = ${JSON.stringify(cert)};
     const key = keyPath ? fs.readFileSync(keyPath) : null;
     const cert = certPath ? fs.readFileSync(certPath) : null;
     console.log('webApplicationProvider port: ', port);
