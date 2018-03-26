@@ -20,6 +20,7 @@ export default [
         source,
         directory,
         entryScript,
+        clientDirectory,
         publicDirectories
       } = opt;
 
@@ -37,8 +38,8 @@ const app = new Module(null, [ WebApplication, src ])
   .config(['webApplicationProvider', webApplicationProvider => {
     console.log('CConfiguring webApplicationProvider');
     const port = (process.env.PORT || 8080)|0;
-    const keyPath = ${JSON.stringify(key)};
-    const certPath = ${JSON.stringify(cert)};
+    const keyPath = ${JSON.stringify(key ? clientDirectory + key : '')};
+    const certPath = ${JSON.stringify(cert ? clientDirectory + cert : '')};
     const key = keyPath ? fs.readFileSync(keyPath) : null;
     const cert = certPath ? fs.readFileSync(certPath) : null;
     console.log('webApplicationProvider port: ', port);
