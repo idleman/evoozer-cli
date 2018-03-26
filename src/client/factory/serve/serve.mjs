@@ -29,6 +29,7 @@ export default [
 
       const key = ssl.key ? `${clientDirectory}/${ssl.key}` : '';
       const cert = ssl.cert ? `${clientDirectory}/${ssl.cert}` : '';
+      const ca = ssl.cert ? `${clientDirectory}/${ssl.ca}` : '';
 
       const content =`import Module from 'evoozer/Module';
 import WebApplication from 'evoozer/Module/web-application';
@@ -41,13 +42,14 @@ const app = new Module(null, [ WebApplication, src ])
     console.log('CConfiguring webApplicationProvider');
     const port = (process.env.PORT || 8080)|0;
     const keyPath = ${JSON.stringify(key)};
-    const certPath = ${JSON.stringify(cert)};
+    const caPath = ${JSON.stringify(ca)};
     const key = keyPath ? fs.readFileSync(keyPath) : null;
     const cert = certPath ? fs.readFileSync(certPath) : null;
+    const ca = caPath ? fs.readFileSync(caPath) : null;
     console.log('webApplicationProvider port: ', port);
     webApplicationProvider
       ${publicDirectories.map(toAddPublicDirectoryCall).join('\n')}
-      .addServer({ port, key, cert })
+      .addServer({ port, key, cert, ca })
   }])
   .config(['routerProvider', routerProvider => {
     const script = [
