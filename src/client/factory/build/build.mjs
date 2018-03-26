@@ -1,11 +1,6 @@
-import path from 'path';
-import mkdirRecursive from 'mkdir-recursive';
-const { mkdir } = mkdirRecursive;
+import fs from 'fs-extra';
 
-//path.normalize('/foo/bar//baz/asdf/quux/..');
-
-
-const createDirectory = (path, cb) => new Promise((resolve, reject) => mkdir(path, err => err ? reject(err) : resolve()));
+const createDirectory = (path) => new Promise((resolve, reject) => fs.ensureDir(path, err => err ? reject(err) : resolve()));
 
 export default [
   'env/exec',

@@ -26,6 +26,7 @@
     "babel-loader": "^8.0.0-beta.2",
     "chokidar": "^2.0.3",
     "evoozer": "github:idleman/evoozer",
+    "fs-extra": "^5.0.0",
     "left-pad": "^1.2.0",
     "mkdir-recursive": "^0.4.0",
     "webpack": "^4.2.0"

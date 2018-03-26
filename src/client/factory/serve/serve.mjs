@@ -1,11 +1,7 @@
 import child_process from 'child_process';
-import mkdirRecursive from 'mkdir-recursive';
-const { mkdir } = mkdirRecursive;
+import fs from 'fs-extra';
 
-//path.normalize('/foo/bar//baz/asdf/quux/..');
-
-
-const createDirectory = (path, cb) => new Promise((resolve, reject) => mkdir(path, err => err ? reject(err) : resolve()));
+const createDirectory = (path) => new Promise((resolve, reject) => fs.ensureDir(path, err => err ? reject(err) : resolve()));
 
 export default [
   'env/exec',
@@ -110,7 +106,7 @@ instance.initiate()
         .then(() => getClientStatus(serveOptions))
         .then(status => {
           const { hash } = status;
-          const source = `../../../../${config.build}`;
+          const source = `../../../../${clientDirectory}`;
           const publicDirectories = [build, `${source}public/`];
           const entryScript = `${hash}.js`;
           const { serverOptions = {} } = config;
