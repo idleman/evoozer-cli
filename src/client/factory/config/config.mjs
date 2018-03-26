@@ -3,7 +3,8 @@ export default [
   '$invoke',
   'process',
   'workspace/config',
-  ($invoke, process, getWorkspaceConfig) => {
+  'filesystem/readFile',
+  ($invoke, process, getWorkspaceConfig, readFile) => {
 
     return function getClientConfig(name) {
 
@@ -15,10 +16,12 @@ export default [
           const build = workspaceDirectories.build + folder;
           const tmp = workspaceDirectories.tmp + (name ? `client/${name}/` : '');
           const directories = { build, tmp };
-          return {
+          const defaultConfig = {
             directory,
             directories
           };
+          return readFile(directory + 'package.json', 'json')
+            .then(opt => Object.assign({}, opt, defaultConfig), () => defaultConfig);
         });
     };
   }

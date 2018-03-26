@@ -1,4 +1,5 @@
 import child_process from 'child_process';
+import fs from 'fs';
 
 export default [
   'env/exec',
@@ -13,21 +14,37 @@ export default [
       return `.addPublicDirectory('${publicDirectory}')`;
     };
 
-    const createWraperIndexFile = (tmp, appSource, entryScript, publicDirectories = []) => {
+    const createWraperIndexFile = (opt = {}) => {
+      const {
+        ssl,
+        source,
+        directory,
+        entryScript,
+        publicDirectories
+      } = opt;
+
+
+      const key = ssl.key ? `${source}/${ssl.key}` : null;
+      const cert = ssl.cert ? `${source}/${ssl.cert}` : null;
+
       const content =`import Module from 'evoozer/Module';
 import WebApplication from 'evoozer/Module/web-application';
 import path from 'path';
-import src from '${appSource.replace(/\/$/, '')}';
-
+import src from '${source.replace(/\/$/, '')}';
+import fs from 'fs';
 
 const app = new Module(null, [ WebApplication, src ])
   .config(['webApplicationProvider', webApplicationProvider => {
     console.log('CConfiguring webApplicationProvider');
     const port = (process.env.PORT || 8080)|0;
+    const keyPath = ${key};
+    const certPath = ${cert};
+    const key = keyPath ? fs.readFileSync(keyPath) : null;
+    const cert = certPath ? fs.readFileSync(certPath) : null;
     console.log('webApplicationProvider port: ', port);
     webApplicationProvider
       ${publicDirectories.map(toAddPublicDirectoryCall).join('\n')}
-      .addServer({ port })
+      .addServer({ port, key, cert })
   }])
   .config(['routerProvider', routerProvider => {
     const script = [
@@ -67,7 +84,7 @@ const instance = app.createInstance();
 
 instance.initiate()
   .then(null, console.error.bind(console));`;
-      const src = `${tmp}index.mjs`;
+      const src = `${directory}index.mjs`;
       return writeFile(src, content, 'utf8');
     };
 
@@ -79,24 +96,32 @@ instance.initiate()
 
     const createWrapperFolder = (config, serveOptions) => {
       const { build, tmp } = config.directories;
-      const serverBuildDir = `${tmp}server-build/`;
+      const directory = `${tmp}server-build/`;
       return Promise.resolve()
         .then(() => createDirectory(tmp + '../../'))
         .then(() => createDirectory(tmp + '../'))
         .then(() => createDirectory(tmp))
-        .then(() => createDirectory(serverBuildDir))
+        .then(() => createDirectory(directory))
         .then(() => getClientStatus(serveOptions))
         .then(status => {
           const { hash } = status;
-          const appSource = `../../../../${config.directory}`;
-          const publicDirectories = [build, `${appSource}public/`];
+          const source = `../../../../${config.directory}`;
+          const publicDirectories = [build, `${source}public/`];
           const entryScript = `${hash}.js`;
+          const { serverOptions = {} } = config;
+          const { ssl = {} } = serverOptions;
           return Promise.all([
-            createWraperIndexFile(serverBuildDir, appSource, entryScript, publicDirectories),
-            createWraperPackageJsonFile(serverBuildDir)
+            createWraperPackageJsonFile(directory),
+            createWraperIndexFile({
+              ssl,
+              source,
+              directory,
+              entryScript,
+              publicDirectories
+            })
           ])
         })
-        .then(() => serverBuildDir);
+        .then(() => directory);
     };
 
     return function serveClient(serveOptions) {

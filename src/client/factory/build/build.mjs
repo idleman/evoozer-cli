@@ -59,24 +59,13 @@ instance.initiate()
     };
 
     const createWrapperFolder = config => {
-      console.log('createWrapperFolder', config);
       const { tmp } = config.directories;
       const browserBuildDir = `${tmp}browser-build/`;
-      console.log('createWrapperFolder browserBuildDir', {
-        browserBuildDir,
-        cwd: process.cwd()
-      });
-
       return createDirectory(browserBuildDir)
         .then(() => {
           const appSource = `../../../../${config.directory}`;
-          console.log('createWrapperFolder appSource:' + appSource);
           return Promise.all([createWraperIndexFile(browserBuildDir, appSource), createWraperPackageJsonFile(browserBuildDir)])
             .then(() => browserBuildDir);
-        })
-        .then(null, err => {
-          console.error(err);
-          throw err;
         });
     };
 
@@ -101,19 +90,18 @@ instance.initiate()
     };
 
     return function buildClient(options) {
-      const { mode = 'development', name } = options;
-      console.log('buildClient', options);
+      const { NODE_ENV = 'development' } = process.env;
+      const { mode = NODE_ENV, name } = options;
+
       return getClientConfig(name)
         .then(config => {
-          console.log('buildClient client config', config);
           return createWrapperFolder(config)
             .then(inputPath => {
-              console.log('buildClient inputPath', inputPath);
               const output = config.directories.build;
               const cmd = `webpack-cli --mode ${mode} ${inputPath} --output-path="${output}" --output-filename="[hash].js" --module-bind js=babel-loader`;
               //const cwd = '../';
               const options = { };
-              console.log('buildClient exec', cmd);
+              console.log('buildClient:', cmd);
               return exec(cmd, options)
                 .then(getBuildInformation)
                 .then(buildInfo => updateBuildLog(output, name, buildInfo))
