@@ -110,7 +110,7 @@ instance.initiate()
         .then(status => {
           const { hash } = status;
           const source = `../../../../${clientDirectory}`;
-          const publicDirectories = [build, `${source}public/`];
+          const publicDirectories = [build, `${clientDirectory}public/`];
           const entryScript = `${hash}.js`;
           const { serverOptions = {} } = config;
           const { ssl = {} } = serverOptions;
